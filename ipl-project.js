@@ -1,46 +1,61 @@
 var matchArray = [];
-lonload = fetch("./archive/matches.csv").then(res => {
-    return res.text()
-}).then(data => {
+var deliveryArray = [];
 
-    var result = data.split("\n");
-    for (let i = 0; i < result.length; i++) {
-        var cells = result[i].split(",");
+onloadMatch = fetch("./archive/matches.csv").then(response => {
+    return response.text()
+}).then(data => {
+    var array = data.split("\n");
+    array.forEach(row => {
+        var cells = row.split(",");
         matchArray.push(cells);
-    }
-    totalMatchPlayedInEachYear(matchArray);
-    totalWonMatchesByEachTeam(matchArray);
+
+    });
+
+    onloadDelivery = fetch("./archive/deliveries.csv").then(response => {
+        return response.text()
+    }).then(data => {
+
+        var array = data.split("\n");
+        array.forEach(row => {
+            var cells = row.split(",");
+            deliveryArray.push(cells);
+
+        });
+        totalMatchPlayedInEachYear(matchArray);
+        totalWonMatchesByEachTeam(matchArray);
+    });
 });
-//console.log(matchArray);
 
 function totalMatchPlayedInEachYear(result) {
-    const myMap = new Map();
+    const totalMatchesBySeason = new Map();
 
-    for (let i = 1; i < result.length; i++) {
+    for (var index = 1; index < result.length; index++) {
 
-        if (myMap.has(result[i][1])) {
-            myMap.set(result[i][1], (myMap.get(result[i][1]) + 1));
+        const matchSeason = 1;
+        if (totalMatchesBySeason.has(result[index][matchSeason])) {
+            totalMatchesBySeason.set(result[index][matchSeason],
+                (totalMatchesBySeason.get(result[index][matchSeason]) + 1));
         }
         else {
-            myMap.set(result[i][1], 1);
+            totalMatchesBySeason.set(result[index][matchSeason], 1);
         }
     }
-    for (var entery of myMap) {
-        console.log(entery);
-    }
+    console.log(totalMatchesBySeason);
+    
 }
-function totalWonMatchesByEachTeam(result) {
-    const myMap = new Map();
 
-    for (let i = 1; i < result.length; i++) {
-        if (myMap.has(result[i][10])) {
-            myMap.set(result[i][10], (myMap.get(result[i][10]) + 1));
+function totalWonMatchesByEachTeam(result) {
+    const WonMatchesByEachTeam = new Map();
+
+    for (let index = 1; index < result.length; index++) {
+        const matchWinner = 10;
+        if (WonMatchesByEachTeam.has(result[index][matchWinner])) {
+            WonMatchesByEachTeam.set(result[index][matchWinner],
+                (WonMatchesByEachTeam.get(result[index][matchWinner]) + 1));
         }
         else {
-            myMap.set(result[i][10], 1);
+            WonMatchesByEachTeam.set(result[index][matchWinner], 1);
         }
     }
-    for (var entery of myMap) {
-        console.log(entery);
-    }
+    console.log(WonMatchesByEachTeam);
 }
