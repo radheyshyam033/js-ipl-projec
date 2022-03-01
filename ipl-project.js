@@ -21,41 +21,127 @@ onloadMatch = fetch("./archive/matches.csv").then(response => {
             deliveryArray.push(cells);
 
         });
-        totalMatchPlayedInEachYear(matchArray);
-        totalWonMatchesByEachTeam(matchArray);
+        solveScenario();
     });
 });
 
-function totalMatchPlayedInEachYear(result) {
-    const totalMatchesBySeason = new Map();
+function solveScenario() {
+    totalMatchPlayedInEachYear(matchArray);
+    totalWonMatchesByEachTeam(matchArray);
+    extraRunMadeByEachTeamIn2016(matchArray, deliveryArray);
+    topEconomicalBowlerOf2015(matchArray, deliveryArray);
 
-    for (var index = 1; index < result.length; index++) {
-
-        const matchSeason = 1;
-        if (totalMatchesBySeason.has(result[index][matchSeason])) {
-            totalMatchesBySeason.set(result[index][matchSeason],
-                (totalMatchesBySeason.get(result[index][matchSeason]) + 1));
-        }
-        else {
-            totalMatchesBySeason.set(result[index][matchSeason], 1);
-        }
-    }
-    console.log(totalMatchesBySeason);
-    
 }
 
-function totalWonMatchesByEachTeam(result) {
-    const WonMatchesByEachTeam = new Map();
+const MATCH_SEASON = 1;
+function totalMatchPlayedInEachYear(matchArray) {
+    var totalMatchesBySeason = new Map();
 
-    for (let index = 1; index < result.length; index++) {
-        const matchWinner = 10;
-        if (WonMatchesByEachTeam.has(result[index][matchWinner])) {
-            WonMatchesByEachTeam.set(result[index][matchWinner],
-                (WonMatchesByEachTeam.get(result[index][matchWinner]) + 1));
+    for (var index = 1; index < matchArray.length; index++) {
+        
+        if (totalMatchesBySeason.has(matchArray[index][MATCH_SEASON])) {
+            totalMatchesBySeason.set(matchArray[index][MATCH_SEASON],
+                (totalMatchesBySeason.get(matchArray[index][MATCH_SEASON]) + 1));
         }
-        else {
-            WonMatchesByEachTeam.set(result[index][matchWinner], 1);
+        else if (matchArray[index][MATCH_SEASON] !== undefined) {
+            totalMatchesBySeason.set(matchArray[index][MATCH_SEASON], 1);
         }
     }
+    console.log("1. Number of matches played per year of all the years in IPL.");
+    console.log(totalMatchesBySeason);
+
+}
+
+const MATCH_WINNER = 10;
+function totalWonMatchesByEachTeam(matchArray) {
+    var WonMatchesByEachTeam = new Map();
+
+    matchArray.forEach(row => {
+        if (WonMatchesByEachTeam.has(row[MATCH_WINNER])) {
+            WonMatchesByEachTeam.set(row[MATCH_WINNER],
+                (WonMatchesByEachTeam.get(row[MATCH_WINNER]) + 1));
+        }
+        else if (row[MATCH_WINNER] != undefined) {
+            WonMatchesByEachTeam.set(row[MATCH_WINNER], 1);
+        }
+    });
+
+    console.log("2. Number of matches won of all teams over all the years of IPL.");
     console.log(WonMatchesByEachTeam);
+}
+
+const BATTING_TEAM = 2;
+const EXTRA_RUNS = 16;
+const deliveryId = 0;
+function extraRunMadeByEachTeamIn2016(matchArray, deliveryArray) {
+    const yearOfMatch = 2016;
+    var idOfMatch = getIdByYear(matchArray, yearOfMatch);
+
+    var extrarunByTeam = new Map();
+    idOfMatch.forEach(matchId => {
+        deliveryArray.forEach(row => {
+            if (matchId === row[deliveryId]) {
+                if (extrarunByTeam.has(row[BATTING_TEAM])) {
+                    extrarunByTeam.set(row[BATTING_TEAM], extrarunByTeam.get(row[BATTING_TEAM]) + parseInt(row[EXTRA_RUNS]));
+                }
+                else if (row[2] != "" && row[BATTING_TEAM] != undefined) {
+                    extrarunByTeam.set(row[BATTING_TEAM], parseInt(row[EXTRA_RUNS]));
+                }
+            }
+        });
+    });
+    console.log("3. For the year 2016 the extra runs conceded per team.")
+    console.log(extrarunByTeam);
+}
+
+const BOWLER = 8;
+const TOTAL_RUNS = 17;
+const MAX_VALUE = 1000;
+function topEconomicalBowlerOf2015() {
+    const yearOfMatch = 2015;
+    var idOfMatch = getIdByYear(matchArray, yearOfMatch);
+
+    var totalRunByBowler = new Map();
+    var totalBallByBowler = new Map();
+
+    idOfMatch.forEach(matchId => {
+        deliveryArray.forEach(row => {
+            if (matchId === row[deliveryId]) {
+                if (totalRunByBowler.has(row[BOWLER])) {
+                    totalRunByBowler.set(row[BOWLER], (totalRunByBowler.get(row[BOWLER]) + parseInt(row[TOTAL_RUNS])));
+                    if (parseInt(row[10]) === 0) {
+                        totalBallByBowler.set(row[BOWLER], (totalRunByBowler.get(row[BOWLER]) + 1));
+                    }
+                }
+                else {
+                    totalRunByBowler.set(row[BOWLER], parseInt(row[TOTAL_RUNS]));
+                    totalBallByBowler.set(row[BOWLER], 1);
+                }
+            }
+        });
+    });
+
+    var bowlerName = "";
+    var minEcoValue = MAX_VALUE;
+    totalRunByBowler.forEach((value, key) => {
+        var score = value;
+        var ball = totalBallByBowler.get(key);
+        var economic = (score * 6) / ball;
+        if (economic < minEcoValue) {
+            minEcoValue = economic;
+            bowlerName = key;
+        }
+    });
+    console.log("4. Top economical bowler of 2015.")
+    console.log(bowlerName + " " + minEcoValue);
+}
+
+function getIdByYear(matchArray, yearOfMatch) {
+    var idOfMatch = [];
+    matchArray.forEach(row => {
+        if (row[1] == yearOfMatch) {
+            idOfMatch.push(row[0]);
+        }
+    });
+    return idOfMatch;
 }
