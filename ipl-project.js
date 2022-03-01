@@ -34,10 +34,10 @@ function solveScenario() {
 }
 
 const MATCH_SEASON = 1;
-function totalMatchPlayedInEachYear(row) {
+function totalMatchPlayedInEachYear(matchArray) {
     var totalMatchesBySeason = new Map();
     var flag=false;
-    row.forEach(row=>{
+    matchArray.forEach(row=>{
         if (totalMatchesBySeason.has(row[MATCH_SEASON])) {
             totalMatchesBySeason.set(row[MATCH_SEASON],
                 (totalMatchesBySeason.get(row[MATCH_SEASON]) + 1));
