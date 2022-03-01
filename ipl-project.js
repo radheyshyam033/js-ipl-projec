@@ -14,7 +14,7 @@ onloadMatch = fetch("./archive/matches.csv").then(response => {
     onloadDelivery = fetch("./archive/deliveries.csv").then(response => {
         return response.text()
     }).then(data => {
-
+        
         var array = data.split("\n");
         array.forEach(row => {
             var cells = row.split(",");
@@ -34,19 +34,19 @@ function solveScenario() {
 }
 
 const MATCH_SEASON = 1;
-function totalMatchPlayedInEachYear(matchArray) {
+function totalMatchPlayedInEachYear(row) {
     var totalMatchesBySeason = new Map();
-
-    for (var index = 1; index < matchArray.length; index++) {
-        
-        if (totalMatchesBySeason.has(matchArray[index][MATCH_SEASON])) {
-            totalMatchesBySeason.set(matchArray[index][MATCH_SEASON],
-                (totalMatchesBySeason.get(matchArray[index][MATCH_SEASON]) + 1));
+    var flag=false;
+    row.forEach(row=>{
+        if (totalMatchesBySeason.has(row[MATCH_SEASON])) {
+            totalMatchesBySeason.set(row[MATCH_SEASON],
+                (totalMatchesBySeason.get(row[MATCH_SEASON]) + 1));
         }
-        else if (matchArray[index][MATCH_SEASON] !== undefined) {
-            totalMatchesBySeason.set(matchArray[index][MATCH_SEASON], 1);
+        else if (row[MATCH_SEASON] !== undefined && flag===true) {
+            totalMatchesBySeason.set(row[MATCH_SEASON], 1);
         }
-    }
+        flag=true;
+    });
     console.log("1. Number of matches played per year of all the years in IPL.");
     console.log(totalMatchesBySeason);
 
@@ -55,15 +55,17 @@ function totalMatchPlayedInEachYear(matchArray) {
 const MATCH_WINNER = 10;
 function totalWonMatchesByEachTeam(matchArray) {
     var WonMatchesByEachTeam = new Map();
+    var flag=false;
 
     matchArray.forEach(row => {
         if (WonMatchesByEachTeam.has(row[MATCH_WINNER])) {
             WonMatchesByEachTeam.set(row[MATCH_WINNER],
                 (WonMatchesByEachTeam.get(row[MATCH_WINNER]) + 1));
         }
-        else if (row[MATCH_WINNER] != undefined) {
+        else if (row[MATCH_WINNER] != undefined && flag===true) {
             WonMatchesByEachTeam.set(row[MATCH_WINNER], 1);
         }
+        flag=true;
     });
 
     console.log("2. Number of matches won of all teams over all the years of IPL.");
