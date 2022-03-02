@@ -1,8 +1,8 @@
 var matchArray = [];
 var deliveryArray = [];
 
-onloadMatch = fetch("./archive/matches.csv").then(response => {
-    return response.text()
+onloadMatch = fetch("./archive/matches.csv").then(matchData => {
+    return matchData.text();
 }).then(data => {
     var array = data.split("\n");
     array.forEach(row => {
@@ -11,10 +11,9 @@ onloadMatch = fetch("./archive/matches.csv").then(response => {
 
     });
 
-    onloadDelivery = fetch("./archive/deliveries.csv").then(response => {
-        return response.text()
+    onloadDelivery = fetch("./archive/deliveries.csv").then(deliveryData => {
+        return deliveryData.text()
     }).then(data => {
-        
         var array = data.split("\n");
         array.forEach(row => {
             var cells = row.split(",");
@@ -79,26 +78,27 @@ function extraRunMadeByEachTeamIn2016(matchArray, deliveryArray) {
     const yearOfMatch = 2016;
     var idOfMatch = getIdByYear(matchArray, yearOfMatch);
 
-    var extrarunByTeam = new Map();
+    var extraRunByTeam = new Map();
     idOfMatch.forEach(matchId => {
         deliveryArray.forEach(row => {
             if (matchId === row[deliveryId]) {
-                if (extrarunByTeam.has(row[BATTING_TEAM])) {
-                    extrarunByTeam.set(row[BATTING_TEAM], extrarunByTeam.get(row[BATTING_TEAM]) + parseInt(row[EXTRA_RUNS]));
+                if (extraRunByTeam.has(row[BATTING_TEAM])) {
+                    extraRunByTeam.set(row[BATTING_TEAM], extraRunByTeam.get(row[BATTING_TEAM]) + parseInt(row[EXTRA_RUNS]));
                 }
-                else if (row[2] != "" && row[BATTING_TEAM] != undefined) {
-                    extrarunByTeam.set(row[BATTING_TEAM], parseInt(row[EXTRA_RUNS]));
+                else if (row[BATTING_TEAM] !== '' && row[BATTING_TEAM] != undefined) {
+                    extraRunByTeam.set(row[BATTING_TEAM], parseInt(row[EXTRA_RUNS]));
                 }
             }
         });
     });
     console.log("3. For the year 2016 the extra runs conceded per team.")
-    console.log(extrarunByTeam);
+    console.log(extraRunByTeam);
 }
 
 const BOWLER = 8;
 const TOTAL_RUNS = 17;
 const MAX_VALUE = 1000;
+const WIDE_RUN = 10;
 function topEconomicalBowlerOf2015() {
     const yearOfMatch = 2015;
     var idOfMatch = getIdByYear(matchArray, yearOfMatch);
@@ -111,13 +111,16 @@ function topEconomicalBowlerOf2015() {
             if (matchId === row[deliveryId]) {
                 if (totalRunByBowler.has(row[BOWLER])) {
                     totalRunByBowler.set(row[BOWLER], (totalRunByBowler.get(row[BOWLER]) + parseInt(row[TOTAL_RUNS])));
-                    if (parseInt(row[10]) === 0) {
+                    if (parseInt(row[WIDE_RUN]) === 0) {
                         totalBallByBowler.set(row[BOWLER], (totalRunByBowler.get(row[BOWLER]) + 1));
                     }
                 }
                 else {
                     totalRunByBowler.set(row[BOWLER], parseInt(row[TOTAL_RUNS]));
-                    totalBallByBowler.set(row[BOWLER], 1);
+                    if(parseInt(row[WIDE_RUN]===0)){
+                        totalBallByBowler.set(row[BOWLER], 1);
+                    }
+                    
                 }
             }
         });
