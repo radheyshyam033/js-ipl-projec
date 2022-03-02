@@ -1,8 +1,11 @@
 var matchArray = [];
 var deliveryArray = [];
 
-onloadMatch = fetch("./archive/matches.csv").then(matchData => {
-    return matchData.text();
+onloadMatch = fetch("./archive/matches.csv").then(response => {
+    if(!response.ok){
+        throw Error(response.statusText);
+    }
+    return response.text();
 }).then(data => {
     var array = data.split("\n");
     array.forEach(row => {
@@ -11,8 +14,11 @@ onloadMatch = fetch("./archive/matches.csv").then(matchData => {
 
     });
 
-    onloadDelivery = fetch("./archive/deliveries.csv").then(deliveryData => {
-        return deliveryData.text()
+    onloadDelivery = fetch("./archive/deliveries.csv").then(response => {
+        if(!response.ok){
+            throw Error(response.statusText);
+        }
+        return response.text()
     }).then(data => {
         var array = data.split("\n");
         array.forEach(row => {
@@ -35,17 +41,19 @@ function solveScenario() {
 const MATCH_SEASON = 1;
 function totalMatchPlayedInEachYear(matchArray) {
     var totalMatchesBySeason = new Map();
-    var flag=false;
-    matchArray.forEach(row=>{
+    var flag = false;
+
+    matchArray.forEach(row => {
         if (totalMatchesBySeason.has(row[MATCH_SEASON])) {
             totalMatchesBySeason.set(row[MATCH_SEASON],
                 (totalMatchesBySeason.get(row[MATCH_SEASON]) + 1));
         }
-        else if (row[MATCH_SEASON] !== undefined && flag===true) {
+        else if (row[MATCH_SEASON] !== undefined && flag === true) {
             totalMatchesBySeason.set(row[MATCH_SEASON], 1);
         }
-        flag=true;
+        flag = true;
     });
+
     console.log("1. Number of matches played per year of all the years in IPL.");
     console.log(totalMatchesBySeason);
 
@@ -54,17 +62,17 @@ function totalMatchPlayedInEachYear(matchArray) {
 const MATCH_WINNER = 10;
 function totalWonMatchesByEachTeam(matchArray) {
     var WonMatchesByEachTeam = new Map();
-    var flag=false;
+    var flag = false;
 
     matchArray.forEach(row => {
         if (WonMatchesByEachTeam.has(row[MATCH_WINNER])) {
             WonMatchesByEachTeam.set(row[MATCH_WINNER],
                 (WonMatchesByEachTeam.get(row[MATCH_WINNER]) + 1));
         }
-        else if (row[MATCH_WINNER] != undefined && flag===true) {
+        else if (row[MATCH_WINNER] != undefined && flag === true) {
             WonMatchesByEachTeam.set(row[MATCH_WINNER], 1);
         }
-        flag=true;
+        flag = true;
     });
 
     console.log("2. Number of matches won of all teams over all the years of IPL.");
@@ -74,6 +82,7 @@ function totalWonMatchesByEachTeam(matchArray) {
 const BATTING_TEAM = 2;
 const EXTRA_RUNS = 16;
 const deliveryId = 0;
+
 function extraRunMadeByEachTeamIn2016(matchArray, deliveryArray) {
     const yearOfMatch = 2016;
     var idOfMatch = getIdByYear(matchArray, yearOfMatch);
@@ -85,7 +94,7 @@ function extraRunMadeByEachTeamIn2016(matchArray, deliveryArray) {
                 if (extraRunByTeam.has(row[BATTING_TEAM])) {
                     extraRunByTeam.set(row[BATTING_TEAM], extraRunByTeam.get(row[BATTING_TEAM]) + parseInt(row[EXTRA_RUNS]));
                 }
-                else if (row[BATTING_TEAM] !== '' && row[BATTING_TEAM] != undefined) {
+                else if (row[BATTING_TEAM] !="" && row[BATTING_TEAM] != undefined) {
                     extraRunByTeam.set(row[BATTING_TEAM], parseInt(row[EXTRA_RUNS]));
                 }
             }
@@ -99,6 +108,7 @@ const BOWLER = 8;
 const TOTAL_RUNS = 17;
 const MAX_VALUE = 1000;
 const WIDE_RUN = 10;
+
 function topEconomicalBowlerOf2015() {
     const yearOfMatch = 2015;
     var idOfMatch = getIdByYear(matchArray, yearOfMatch);
@@ -117,10 +127,10 @@ function topEconomicalBowlerOf2015() {
                 }
                 else {
                     totalRunByBowler.set(row[BOWLER], parseInt(row[TOTAL_RUNS]));
-                    if(parseInt(row[WIDE_RUN]===0)){
+                    if (parseInt(row[WIDE_RUN] === 0)) {
                         totalBallByBowler.set(row[BOWLER], 1);
                     }
-                    
+
                 }
             }
         });
